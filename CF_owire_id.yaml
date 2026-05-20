@@ -1,0 +1,53 @@
+---
+info:
+  name: CF_owire_id
+  description: Dallas/Maxim 1-Wire slave (Read-ROM subset) for ChipFoundry OpenFrame projects. Publishes the padframe mask_rev as a DS2401-compatible 64-bit ROM ID over a single open-drain pin. NO external clock connection required -- uses an internal ring oscillator -- which makes it the right ID-readout choice for OpenFrame designs that don't have a clock to spare. Ships with two OpenFrame pad wrappers (CF_owire_id_pad for dedicated-pin use, CF_owire_id_shared for sharing the open-drain pin with user logic), a self-checking iverilog testbench, and a host-side Python decoder.
+  repo: github.com/chipfoundry/CF_owire_id
+  owner: ChipFoundry, a DBA of Umbralogic Technologies LLC
+  license: APACHE 2.0
+  author: ChipFoundry, a DBA of Umbralogic Technologies LLC
+  email: ip_admin@chipfoundry.com
+  version: v1.1.0
+  date: 05-20-2026
+  category: digital
+  tags:
+    - id
+    - readout
+    - 1-wire
+    - dallas
+    - maxim
+    - openframe
+    - clock-free
+    - mask_rev
+  bus:
+    - generic
+  type: soft
+  status: verified
+  cell_count: n/a
+  width: "0.0"
+  height: "0.0"
+  technology: n/a
+  clock_freq_mhz: n/a
+  digital_supply_voltage: n/a
+  analog_supply_voltage: n/a
+  irq_reg_offset: n/a
+  fifo_reg_offset: n/a
+modules:
+  - name: CF_owire_id
+    file: rtl/CF_owire_id.v
+    description: 1-Wire slave core. Internal ring oscillator, FSM, CRC-8.
+  - name: CF_owire_id_pad
+    file: rtl/CF_owire_id_pad.v
+    description: OpenFrame pad wrapper. Bundles the core with one dedicated GPIO worth of open-drain pad config.
+  - name: CF_owire_id_shared
+    file: rtl/CF_owire_id_shared.v
+    description: OpenFrame pad wrapper. Lets user logic co-drive the same open-drain GPIO (pull-low + read) alongside the IP.
+parameters:
+  - {name: FAMILY_CODE,       default: "8'hCF",    desc: "Dallas family-code byte that prefixes the ROM."}
+  - {name: SERIAL_HIGH,       default: "16'hCF1D", desc: "High 16 bits of the 48-bit serial."}
+  - {name: OSC_CYCLES_PER_US, default: 100,        desc: "Cycles per microsecond of the internal oscillator. Scale all timings for sim."}
+  - {name: T_RESET_MIN_US,    default: 480,        desc: "Master reset pulse threshold in us (1-Wire standard)."}
+  - {name: T_PRES_DELAY_US,   default: 15,         desc: "Wait after master release before issuing presence (us)."}
+  - {name: T_PRES_LOW_US,     default: 120,        desc: "Presence pulse low time (us)."}
+  - {name: T_SAMPLE_US,       default: 30,         desc: "Sample point inside a master-write slot (us)."}
+  - {name: T_READ_LOW_US,     default: 30,         desc: "Slave-write-0 hold time during a read slot (us)."}

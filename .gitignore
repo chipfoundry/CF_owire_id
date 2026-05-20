@@ -1,0 +1,20 @@
+# Simulation build artefacts
+*.vvp
+*.vcd
+*.fst
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
