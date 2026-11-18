@@ -7,8 +7,8 @@ info:
   license: APACHE 2.0
   author: ChipFoundry, a DBA of Umbralogic Technologies LLC
   email: ip_admin@chipfoundry.com
-  version: v1.1.0
-  date: 05-20-2026
+  version: v1.2.0
+  date: 11-18-2026
   category: digital
   tags:
     - id
@@ -42,6 +42,9 @@ modules:
   - name: CF_owire_id_shared
     file: rtl/CF_owire_id_shared.v
     description: OpenFrame pad wrapper. Lets user logic co-drive the same open-drain GPIO (pull-low + read) alongside the IP.
+  - name: CF_owire_id_mux
+    file: rtl/CF_owire_id_mux.v
+    description: Pad mux. While chip_reset_n is held low the slave owns the GPIO (dm=010) and answers 1-Wire. When chip_reset_n is high the user's pad controls pass through and the slave is held in reset.
 parameters:
   - {name: FAMILY_CODE,       default: "8'hCF",    desc: "Dallas family-code byte that prefixes the ROM."}
   - {name: SERIAL_HIGH,       default: "16'hCF1D", desc: "High 16 bits of the 48-bit serial."}
