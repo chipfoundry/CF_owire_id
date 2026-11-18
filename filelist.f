@@ -16,11 +16,15 @@
 #   - CF_owire_id_shared.v   OpenFrame pad wrapper, shared-pin (open-drain
 #                            co-use) for cases where the ID pin is also
 #                            driven by user logic.
+#   - CF_owire_id_mux.v      Pad mux. While chip_reset_n is low the slave
+#                            owns the pin (dm=010) and can answer a 1-Wire
+#                            read. While chip_reset_n is high the user's
+#                            pad controls pass through and the slave is
+#                            held in reset.
 #
-# Both pad wrappers depend on CF_owire_id.v.  Keep all three unless you
-# have a strong reason to instantiate the core directly; the wrappers are
-# the supported integration path for OpenFrame designs.
+# The wrappers depend on CF_owire_id.v.
 
 rtl/CF_owire_id.v
 rtl/CF_owire_id_pad.v
 rtl/CF_owire_id_shared.v
+rtl/CF_owire_id_mux.v

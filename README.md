@@ -84,9 +84,11 @@ CF_owire_id/
     CF_owire_id.v         # 1-Wire slave core + behavioural / synth osc
     CF_owire_id_pad.v     # OpenFrame pad wrapper -- dedicated GPIO
     CF_owire_id_shared.v  # OpenFrame pad wrapper -- shared GPIO (open-drain co-use)
+    CF_owire_id_mux.v     # Pad mux -- ID owns the pin while chip reset is held
 
   sim/
     tb_CF_owire_id.v      # self-checking iverilog testbench (acts as 1-Wire master)
+    tb_CF_owire_id_mux.v  # mux pass-through and reset-held ROM read
     Makefile              # `make sim` / `make vcd` / `make clean`
 
   host/
@@ -103,8 +105,15 @@ Your OpenFrame synthesis flow only needs the files listed in `filelist.f`. The `
 |----------------------|--------------------------------|--------------------------------------------------------|
 | `CF_owire_id_pad`    | OpenFrame open-drain (`dm=010`) | You can spare one GPIO exclusively for the ID.         |
 | `CF_owire_id_shared` | OpenFrame open-drain (`dm=010`) + ownership mux | The ID pin (e.g. `GPIO[0]`) is also a user-facing pin. |
+| `CF_owire_id_mux`    | `dm=010` while `chip_reset_n` is low; user pad controls otherwise | The harness reads the ID while the part is held in reset, then the user design owns the pin. |
 
 Both wrappers consume **only one** OpenFrame GPIO. Nothing else on the chip is touched — every other GPIO bit is yours to configure.
+
+### `CF_owire_id_mux` — ID while reset is held
+
+`chip_reset_n` is the mux select, and it is not the slave's reset. While it is low the pad is forced to `dm=010` and the slave runs, so a tester can complete a Read ROM for as long as it holds the chip in reset. When `chip_reset_n` goes high, the user's `gpio_out`, `gpio_oeb`, `gpio_dm`, and the other pad controls connect straight through, and the slave is held in reset so later user traffic cannot arm a transaction.
+
+Hold reset for the whole Read ROM. The transaction takes several milliseconds, and releasing reset mid-read gives the pin back. A POR pulse is not long enough and cannot be stretched by the tester.
 
 ### `CF_owire_id_pad` — dedicated GPIO
 
