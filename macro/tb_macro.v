@@ -77,11 +77,11 @@ module tb_macro;
     );
 
     // Scale the core's slot timings for simulation (as in the core testbench).
-    defparam dut.u_core.T_RESET_MIN_US = 5;
-    defparam dut.u_core.T_PRES_DELAY_US = 1;
-    defparam dut.u_core.T_PRES_LOW_US  = 3;
-    defparam dut.u_core.T_SAMPLE_US    = 1;
-    defparam dut.u_core.T_READ_LOW_US  = 2;
+    defparam dut.u_mux.u_ip.T_RESET_MIN_US = 5;
+    defparam dut.u_mux.u_ip.T_PRES_DELAY_US = 1;
+    defparam dut.u_mux.u_ip.T_PRES_LOW_US  = 3;
+    defparam dut.u_mux.u_ip.T_SAMPLE_US    = 1;
+    defparam dut.u_mux.u_ip.T_READ_LOW_US  = 2;
 
     integer pass_count = 0;
     integer fail_count = 0;
@@ -210,18 +210,18 @@ module tb_macro;
         // so its flops are not cleared by reset. Model the worst case: random
         // flops parked in S_TX_HOLD with owire_oeb low, holding the line low.
         // The sustained-low watchdog must release the line before the ROM read.
-        dut.u_core.state       = 4'd9;
-        dut.u_core.owire_oeb   = 1'b0;
-        dut.u_core.cnt         = 0;
-        dut.u_core.cmd_sh      = 0;
-        dut.u_core.cmd_bit_idx = 0;
-        dut.u_core.tx_bit_idx  = 0;
-        dut.u_core.low_cnt     = 0;
-        dut.u_core.owire_in_s1 = 1'b1;
-        dut.u_core.owire_in_s2 = 1'b1;
-        dut.u_core.wire_lvl_d  = 1'b1;
-        dut.u_core.rst_s1      = 1'b1;
-        dut.u_core.rst_s2      = 1'b1;
+        dut.u_mux.u_ip.state       = 4'd9;
+        dut.u_mux.u_ip.owire_oeb   = 1'b0;
+        dut.u_mux.u_ip.cnt         = 0;
+        dut.u_mux.u_ip.cmd_sh      = 0;
+        dut.u_mux.u_ip.cmd_bit_idx = 0;
+        dut.u_mux.u_ip.tx_bit_idx  = 0;
+        dut.u_mux.u_ip.low_cnt     = 0;
+        dut.u_mux.u_ip.owire_in_s1 = 1'b1;
+        dut.u_mux.u_ip.owire_in_s2 = 1'b1;
+        dut.u_mux.u_ip.wire_lvl_d  = 1'b1;
+        dut.u_mux.u_ip.rst_s1      = 1'b1;
+        dut.u_mux.u_ip.rst_s2      = 1'b1;
 
         chip_reset_n = 1'b0;   // chip in reset: ID active
         master_drive_low = 1'b0;
