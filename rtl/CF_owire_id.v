@@ -126,11 +126,28 @@ module CF_owire_id #(
 `endif
 
     //-------------------------------------------------------------------------
+    // Reset synchronizer (osc_clk domain).  Assertion of rst_n is immediate;
+    // release is synchronized to osc_clk over two flops so the FSM never leaves
+    // reset on an arbitrary oscillator edge.  Everything below uses rst_q.
+    //-------------------------------------------------------------------------
+    reg rst_s1, rst_s2;
+    always @(posedge osc_clk or negedge rst_n) begin
+        if (!rst_n) begin
+            rst_s1 <= 1'b0;
+            rst_s2 <= 1'b0;
+        end else begin
+            rst_s1 <= 1'b1;
+            rst_s2 <= rst_s1;
+        end
+    end
+    wire rst_q = rst_s2;
+
+    //-------------------------------------------------------------------------
     // Synchronize the 1-Wire input into the osc_clk domain.
     //-------------------------------------------------------------------------
     reg owire_in_s1, owire_in_s2;
-    always @(posedge osc_clk or negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge osc_clk or negedge rst_q) begin
+        if (!rst_q) begin
             owire_in_s1 <= 1'b1;
             owire_in_s2 <= 1'b1;
         end else begin
@@ -144,8 +161,8 @@ module CF_owire_id #(
     // Edge detector on the synchronized wire.
     //-------------------------------------------------------------------------
     reg wire_lvl_d;
-    always @(posedge osc_clk or negedge rst_n) begin
-        if (!rst_n) wire_lvl_d <= 1'b1;
+    always @(posedge osc_clk or negedge rst_q) begin
+        if (!rst_q) wire_lvl_d <= 1'b1;
         else        wire_lvl_d <= wire_lvl;
     end
     wire wire_fall = (wire_lvl_d == 1'b1) && (wire_lvl == 1'b0);
@@ -207,8 +224,8 @@ module CF_owire_id #(
     // schedules the normal presence pulse.
     //-------------------------------------------------------------------------
     reg [CW-1:0] low_cnt;
-    always @(posedge osc_clk or negedge rst_n) begin
-        if (!rst_n)
+    always @(posedge osc_clk or negedge rst_q) begin
+        if (!rst_q)
             low_cnt <= {CW{1'b0}};
         else if (wire_lvl)
             low_cnt <= {CW{1'b0}};
@@ -246,8 +263,8 @@ module CF_owire_id #(
     // ROM-out shifted out LSB-first.  We just index rom_id[tx_bit_idx].
     wire tx_bit_val = rom_id[tx_bit_idx];
 
-    always @(posedge osc_clk or negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge osc_clk or negedge rst_q) begin
+        if (!rst_q) begin
             state       <= S_IDLE;
             cnt         <= {CW{1'b0}};
             cmd_sh      <= 8'h00;
