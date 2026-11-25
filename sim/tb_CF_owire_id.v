@@ -204,7 +204,7 @@ module tb_CF_owire_id;
     // then assemble + verify the ROM against the expected value built from
     // the current id_in.
     //-------------------------------------------------------------------------
-    task run_read_rom_and_check(input [31:0] expected_id, input [63:0] label);
+    task run_read_rom_and_check(input [31:0] expected_id, input [8*48-1:0] label);
         integer i;
         reg [63:0] rom;
         reg [55:0] rom_low;
@@ -263,6 +263,61 @@ module tb_CF_owire_id;
     endtask
 
     //-------------------------------------------------------------------------
+    // Stuck-state recovery.  Power-up with random flops can park the FSM in
+    // a state that holds owire_oeb low (S_TX_HOLD and S_PRES_LOW can do so
+    // with nothing to release them).  Force that condition and check that the
+    // sustained-low watchdog releases the line (within ~T_RESET_MIN_US) and
+    // the slave returns to S_CMD_WAIT.  Without the watchdog the line stays
+    // low forever and this check fails.
+    //-------------------------------------------------------------------------
+    task recover_from_stuck_state(input [3:0] forced_state, input [8*48-1:0] label);
+        integer elapsed;
+        reg     saw_release;
+        begin
+            master_release;
+            #2_000;
+
+            // Reproduce the deadlock: the master pulls the line low briefly
+            // while the FSM is parked in a state that waits for the wire to
+            // rise and the slave is driving low.  Then the master releases,
+            // but the slave keeps the line low and nothing can bring it high.
+            master_drive;
+            #500;
+            dut.state     = forced_state;
+            dut.owire_oeb = 1'b0;
+            #200;
+            master_release;
+            #500;
+
+            if (owire_wire !== 1'b0) begin
+                $display("FAIL [%0s]: forced stuck state did not hold the wire low", label);
+                fail_count = fail_count + 1;
+            end
+
+            // Watch for the wire going high again within 4 * T_RESET_MIN_US.
+            saw_release = 1'b0;
+            elapsed     = 0;
+            while (elapsed < 4 * T_RESET_MIN_US * 1000) begin
+                #100;
+                elapsed = elapsed + 100;
+                if (owire_wire === 1'b1) saw_release = 1'b1;
+            end
+
+            $display("");
+            $display("---- stuck-state recovery: %0s ----", label);
+            $display("  line released by watchdog : %0s", saw_release ? "yes" : "no");
+            $display("  slave state after recover : %0d (expect 4 = S_CMD_WAIT)", dut.state);
+            if (!saw_release || dut.state != 4'd4) begin
+                $display("  FAIL: slave still stuck");
+                fail_count = fail_count + 1;
+            end else begin
+                $display("  PASS");
+                pass_count = pass_count + 1;
+            end
+        end
+    endtask
+
+    //-------------------------------------------------------------------------
     // Drive the test.
     //-------------------------------------------------------------------------
     initial begin
@@ -287,6 +342,11 @@ module tb_CF_owire_id;
         #2_000;
 
         run_read_rom_and_check(32'h12345678, "frame 2: ID = 0x12345678");
+
+        // Stuck-state recovery (see recover_from_stuck_state).
+        recover_from_stuck_state(4'd9, "forced S_TX_HOLD with owire_oeb low");
+        recover_from_stuck_state(4'd6, "forced S_CMD_HOLD with owire_oeb low");
+        run_read_rom_and_check(32'h12345678, "frame 3: ID after stuck-state recovery");
 
         $display("");
         $display("=========================================");

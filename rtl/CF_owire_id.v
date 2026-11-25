@@ -88,17 +88,35 @@ module CF_owire_id #(
     always #5 sim_osc = ~sim_osc;
     assign osc_clk = sim_osc;
 `elsif SYNTHESIS
-    // Synthesizable ring oscillator placeholder.  Replace these inverter
-    // instances with PDK-keep-attribute cells when integrating into a real
-    // chip flow.  Example for sky130:
-    //   (* keep = "true" *) sky130_fd_sc_hd__inv_2 i0 (.A(n2), .Y(n0));
-    //   (* keep = "true" *) sky130_fd_sc_hd__inv_2 i1 (.A(n0), .Y(n1));
-    //   (* keep = "true" *) sky130_fd_sc_hd__inv_2 i2 (.A(n1), .Y(n2));
-    wire n0, n1, n2;
-    assign #1 n0 = ~n2;
-    assign #1 n1 = ~n0;
-    assign #1 n2 = ~n1;
-    assign osc_clk = n2;
+    // Ring oscillator built from kept sky130_fd_sc_hd cells.
+    //   - NAND2 enable: the ring only runs while rst_n is high, i.e. while
+    //     the core is out of its own reset (the wrapper holds rst_n high
+    //     only during chip reset).  With rst_n low the ring is frozen and
+    //     the divider is held in reset.
+    //   - 4 inverters: 5 inversions total, so the loop oscillates.
+    //   - Ripple divide-by-32 brings the ring (~GHz class) down to the
+    //     ~100 MHz osc_clk the FSM timing constants assume.  The ring
+    //     frequency and therefore the divide ratio must be confirmed by
+    //     STA / silicon measurement (see README, target 0.5x-2x of 100 MHz).
+    (* keep = "true" *) wire r0, r1, r2, r3, r4;
+    (* keep = "true" *) sky130_fd_sc_hd__nand2_1 u_ring_en (.A(rst_n), .B(r4), .Y(r0));
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i1 (.A(r0), .Y(r1));
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i2 (.A(r1), .Y(r2));
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i3 (.A(r2), .Y(r3));
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i4 (.A(r3), .Y(r4));
+
+    reg q0, q1, q2, q3, q4;
+    always @(posedge r4 or negedge rst_n)
+        if (!rst_n) q0 <= 1'b0; else q0 <= ~q0;
+    always @(posedge q0 or negedge rst_n)
+        if (!rst_n) q1 <= 1'b0; else q1 <= ~q1;
+    always @(posedge q1 or negedge rst_n)
+        if (!rst_n) q2 <= 1'b0; else q2 <= ~q2;
+    always @(posedge q2 or negedge rst_n)
+        if (!rst_n) q3 <= 1'b0; else q3 <= ~q3;
+    always @(posedge q3 or negedge rst_n)
+        if (!rst_n) q4 <= 1'b0; else q4 <= ~q4;
+    assign osc_clk = q4;
 `else
     // Default RTL-simulation fallback (same behavioral osc).
     reg sim_osc = 1'b0;
@@ -174,6 +192,32 @@ module CF_owire_id #(
     localparam integer CW = 24;
 
     //-------------------------------------------------------------------------
+    // Sustained-low watchdog (state-independent).
+    //
+    // Counts consecutive osc_clk cycles with the synchronized wire low.  If the
+    // wire stays low for T_RESET_MIN_US from ANY state, the FSM is forced into
+    // S_LOW_COUNT as if a master reset pulse had just started (see the FSM
+    // below).  This recovers from:
+    //   - a power-up with random flops parked in a state that holds
+    //     owire_oeb low (e.g. S_TX_HOLD / S_PRES_LOW), which would otherwise
+    //     keep the line low forever, since the wire is low and the FSM is
+    //     waiting for it to rise;
+    //   - a master holding the wire low for a full reset interval mid-transaction.
+    // Any real master reset ends with a rising edge in S_LOW_COUNT, which
+    // schedules the normal presence pulse.
+    //-------------------------------------------------------------------------
+    reg [CW-1:0] low_cnt;
+    always @(posedge osc_clk or negedge rst_n) begin
+        if (!rst_n)
+            low_cnt <= {CW{1'b0}};
+        else if (wire_lvl)
+            low_cnt <= {CW{1'b0}};
+        else if (low_cnt < C_RESET_MIN[CW-1:0])
+            low_cnt <= low_cnt + 1'b1;
+    end
+    wire sustained_low = (wire_lvl == 1'b0) && (low_cnt >= C_RESET_MIN[CW-1:0]);
+
+    //-------------------------------------------------------------------------
     // FSM
     //-------------------------------------------------------------------------
     localparam [3:0] S_IDLE       = 4'd0;  // wire idle high; waiting for low
@@ -210,6 +254,13 @@ module CF_owire_id #(
             cmd_bit_idx <= 4'd0;
             tx_bit_idx  <= 7'd0;
             owire_oeb   <= 1'b1;     // released (high-Z)
+        end else if (sustained_low) begin
+            // Wire held low for a full reset interval in any state: treat as
+            // the start of a reset pulse and release the line.  The FSM then
+            // waits in S_LOW_COUNT (count pre-loaded) for the rising edge.
+            state     <= S_LOW_COUNT;
+            cnt       <= C_RESET_MIN[CW-1:0];
+            owire_oeb <= 1'b1;
         end else begin
             case (state)
                 S_IDLE: begin
