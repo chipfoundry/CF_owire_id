@@ -6,6 +6,7 @@
     "DESIGN_NAME": "CF_owire_id",
     "VERILOG_FILES": [
         "dir::CF_owire_id_top.v",
+        "dir::CF_owire_id_mux.v",
         "dir::CF_owire_id_core.v"
     ],
     "VERILOG_DEFINES": [
