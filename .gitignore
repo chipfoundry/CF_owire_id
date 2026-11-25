@@ -18,3 +18,5 @@ Thumbs.db
 *~
 .idea/
 .vscode/
+macro/CF_owire_id_core.v
+macro/CF_owire_id_mux.v

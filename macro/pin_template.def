@@ -1,0 +1,133 @@
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN CF_owire_id ;
+UNITS DISTANCE MICRONS 1000 ;
+DIEAREA ( 0 0 ) ( 155000 240000 ) ;
+PINS 62 ;
+- gpio_out_user + NET gpio_out_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 8000 ) ( 2000 8300 ) + PLACED ( 0 0 ) N ;
+- gpio_out_pin + NET gpio_out_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 9500 ) ( 2000 9800 ) + PLACED ( 0 0 ) N ;
+- gpio_oeb_user + NET gpio_oeb_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 14000 ) ( 2000 14300 ) + PLACED ( 0 0 ) N ;
+- gpio_oeb_pin + NET gpio_oeb_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 15500 ) ( 2000 15800 ) + PLACED ( 0 0 ) N ;
+- gpio_inp_dis_user + NET gpio_inp_dis_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 20000 ) ( 2000 20300 ) + PLACED ( 0 0 ) N ;
+- gpio_inp_dis_pin + NET gpio_inp_dis_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 21500 ) ( 2000 21800 ) + PLACED ( 0 0 ) N ;
+- gpio_ib_mode_sel_user + NET gpio_ib_mode_sel_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 26000 ) ( 2000 26300 ) + PLACED ( 0 0 ) N ;
+- gpio_ib_mode_sel_pin + NET gpio_ib_mode_sel_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 27500 ) ( 2000 27800 ) + PLACED ( 0 0 ) N ;
+- gpio_vtrip_sel_user + NET gpio_vtrip_sel_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 32000 ) ( 2000 32300 ) + PLACED ( 0 0 ) N ;
+- gpio_vtrip_sel_pin + NET gpio_vtrip_sel_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 33500 ) ( 2000 33800 ) + PLACED ( 0 0 ) N ;
+- gpio_slow_sel_user + NET gpio_slow_sel_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 38000 ) ( 2000 38300 ) + PLACED ( 0 0 ) N ;
+- gpio_slow_sel_pin + NET gpio_slow_sel_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 39500 ) ( 2000 39800 ) + PLACED ( 0 0 ) N ;
+- gpio_holdover_user + NET gpio_holdover_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 44000 ) ( 2000 44300 ) + PLACED ( 0 0 ) N ;
+- gpio_holdover_pin + NET gpio_holdover_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 45500 ) ( 2000 45800 ) + PLACED ( 0 0 ) N ;
+- gpio_analog_en_user + NET gpio_analog_en_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 50000 ) ( 2000 50300 ) + PLACED ( 0 0 ) N ;
+- gpio_analog_en_pin + NET gpio_analog_en_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 51500 ) ( 2000 51800 ) + PLACED ( 0 0 ) N ;
+- gpio_analog_sel_user + NET gpio_analog_sel_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 56000 ) ( 2000 56300 ) + PLACED ( 0 0 ) N ;
+- gpio_analog_sel_pin + NET gpio_analog_sel_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 57500 ) ( 2000 57800 ) + PLACED ( 0 0 ) N ;
+- gpio_analog_pol_user + NET gpio_analog_pol_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 62000 ) ( 2000 62300 ) + PLACED ( 0 0 ) N ;
+- gpio_analog_pol_pin + NET gpio_analog_pol_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 63500 ) ( 2000 63800 ) + PLACED ( 0 0 ) N ;
+- gpio_dm0_user + NET gpio_dm0_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 68000 ) ( 2000 68300 ) + PLACED ( 0 0 ) N ;
+- gpio_dm0_pin + NET gpio_dm0_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 69500 ) ( 2000 69800 ) + PLACED ( 0 0 ) N ;
+- gpio_dm1_user + NET gpio_dm1_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 74000 ) ( 2000 74300 ) + PLACED ( 0 0 ) N ;
+- gpio_dm1_pin + NET gpio_dm1_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 75500 ) ( 2000 75800 ) + PLACED ( 0 0 ) N ;
+- gpio_dm2_user + NET gpio_dm2_user + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 80000 ) ( 2000 80300 ) + PLACED ( 0 0 ) N ;
+- gpio_dm2_pin + NET gpio_dm2_pin + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER met3 ( 0 81500 ) ( 2000 81800 ) + PLACED ( 0 0 ) N ;
+- chip_reset_n + NET chip_reset_n + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 90000 ) ( 2000 90300 ) + PLACED ( 0 0 ) N ;
+- gpio_in_pin + NET gpio_in_pin + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 94000 ) ( 2000 94300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[0] + NET mask_rev[0] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 98000 ) ( 2000 98300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[1] + NET mask_rev[1] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 102000 ) ( 2000 102300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[2] + NET mask_rev[2] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 106000 ) ( 2000 106300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[3] + NET mask_rev[3] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 110000 ) ( 2000 110300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[4] + NET mask_rev[4] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 114000 ) ( 2000 114300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[5] + NET mask_rev[5] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 118000 ) ( 2000 118300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[6] + NET mask_rev[6] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 122000 ) ( 2000 122300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[7] + NET mask_rev[7] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 126000 ) ( 2000 126300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[8] + NET mask_rev[8] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 130000 ) ( 2000 130300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[9] + NET mask_rev[9] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 134000 ) ( 2000 134300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[10] + NET mask_rev[10] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 138000 ) ( 2000 138300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[11] + NET mask_rev[11] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 142000 ) ( 2000 142300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[12] + NET mask_rev[12] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 146000 ) ( 2000 146300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[13] + NET mask_rev[13] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 150000 ) ( 2000 150300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[14] + NET mask_rev[14] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 154000 ) ( 2000 154300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[15] + NET mask_rev[15] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 158000 ) ( 2000 158300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[16] + NET mask_rev[16] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 162000 ) ( 2000 162300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[17] + NET mask_rev[17] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 166000 ) ( 2000 166300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[18] + NET mask_rev[18] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 170000 ) ( 2000 170300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[19] + NET mask_rev[19] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 174000 ) ( 2000 174300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[20] + NET mask_rev[20] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 178000 ) ( 2000 178300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[21] + NET mask_rev[21] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 182000 ) ( 2000 182300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[22] + NET mask_rev[22] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 186000 ) ( 2000 186300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[23] + NET mask_rev[23] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 190000 ) ( 2000 190300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[24] + NET mask_rev[24] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 194000 ) ( 2000 194300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[25] + NET mask_rev[25] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 198000 ) ( 2000 198300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[26] + NET mask_rev[26] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 202000 ) ( 2000 202300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[27] + NET mask_rev[27] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 206000 ) ( 2000 206300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[28] + NET mask_rev[28] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 210000 ) ( 2000 210300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[29] + NET mask_rev[29] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 214000 ) ( 2000 214300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[30] + NET mask_rev[30] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 218000 ) ( 2000 218300 ) + PLACED ( 0 0 ) N ;
+- mask_rev[31] + NET mask_rev[31] + DIRECTION INPUT + USE SIGNAL
+  + LAYER met3 ( 0 222000 ) ( 2000 222300 ) + PLACED ( 0 0 ) N ;
+- VPWR + NET VPWR + DIRECTION INOUT + USE POWER
+  + LAYER met1 ( 0 228000 ) ( 2000 229500 ) + PLACED ( 0 0 ) N ;
+- VGND + NET VGND + DIRECTION INOUT + USE GROUND
+  + LAYER met1 ( 0 232500 ) ( 2000 234000 ) + PLACED ( 0 0 ) N ;
+END PINS
+END DESIGN

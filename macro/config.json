@@ -1,0 +1,57 @@
+{
+    "//": "CF_owire_id hardened macro. Replaces the placeholder cell at tapeout.",
+    "//pins": "Pin names, layers, and coordinates come from pin_template.def, which",
+    "//pins2": "mirrors the placeholder LEF exactly (gen_pin_template.py).",
+
+    "DESIGN_NAME": "CF_owire_id",
+    "VERILOG_FILES": [
+        "dir::CF_owire_id_top.v",
+        "dir::CF_owire_id_mux.v",
+        "dir::CF_owire_id_core.v"
+    ],
+    "VERILOG_DEFINES": [
+        "USE_POWER_PINS"
+    ],
+
+    "meta": {
+        "version": 3,
+        "flow": "Classic",
+        "substituting_steps": {
+            "Checker.YosysUnmappedCells": null,
+            "+OpenROAD.GlobalRouting": "OwireMacro.PowerStubBridge"
+        }
+    },
+
+    "//clock": "The ring oscillator is internal. There is no external clock, and the",
+    "//clock2": "1-Wire timing is derived from the ring divider, so no clock is constrained.",
+    "CLOCK_PORT": null,
+    "CLOCK_PERIOD": 10,
+
+    "//geometry": "Fixed die and pin frame from the placeholder: 155 x 240 um.",
+    "FP_SIZING": "absolute",
+    "DIE_AREA": [0, 0, 155, 240],
+    "CORE_AREA": [4, 4, 151, 236],
+
+    "//pins-template": "Exact placeholder pin coordinates (pin_template.def).",
+    "FP_DEF_TEMPLATE": "dir::pin_template.def",
+    "FP_TEMPLATE_MATCH_MODE": "permissive",
+    "FP_TEMPLATE_COPY_POWER_PINS": true,
+
+    "VDD_NETS": ["VPWR"],
+    "GND_NETS": ["VGND"],
+    "PDN_MULTILAYER": true,
+    "PDN_CORE_RING": false,
+    "PDN_VPITCH": 40,
+    "PDN_HPITCH": 40,
+    "ERROR_ON_PDN_VIOLATIONS": false,
+
+    "//sign-off": "LVS and DRC of the macro are run by cf-precheck on the tapeout host",
+    "//sign-off2": "(run_be_checks). The flow runs the routed-GDS checks here.",
+    "RUN_LINTER": false,
+    "RUN_LVS": true,
+
+    "PL_TARGET_DENSITY_PCT": 40,
+    "RT_MAX_LAYER": "met4",
+    "MAGIC_WRITE_FULL_LEF": false,
+    "PRIMARY_GDSII_STREAMOUT_TOOL": "klayout"
+}

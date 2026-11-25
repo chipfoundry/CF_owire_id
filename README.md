@@ -264,18 +264,22 @@ Both wrappers add a `mask_rev[31:0]` payload input and the 14 OpenFrame GPIO con
 |-----------------|---------------------------------------------------|-------------------|
 | `COCOTB_SIM`    | Behavioural `always #5 sim_osc = ~sim_osc;`       | cocotb tests      |
 | `IVERILOG_SIM`  | Same behavioural osc                              | this repo's `sim/` |
-| `SYNTHESIS`     | Three-inverter ring placeholder                    | synthesis flow    |
+| `SYNTHESIS`     | Kept sky130 NAND-enabled ring + ripple divide-by-32 | synthesis flow    |
 | (none)          | Behavioural osc (fallback)                         | quick experiments |
 
-For real silicon you MUST replace the `\`ifdef SYNTHESIS` placeholder with PDK-keep-attribute cells (so the synthesizer doesn't optimize the ring away). Example for sky130:
+The `SYNTHESIS` branch is a kept sky130 ring, gated by `rst_n` (the ring only runs while the core is out of reset):
 
 ```verilog
-(* keep = "true" *) sky130_fd_sc_hd__inv_2 i0 (.A(n2), .Y(n0));
-(* keep = "true" *) sky130_fd_sc_hd__inv_2 i1 (.A(n0), .Y(n1));
-(* keep = "true" *) sky130_fd_sc_hd__inv_2 i2 (.A(n1), .Y(n2));
+(* keep = "true" *) sky130_fd_sc_hd__nand2_1 u_ring_en (.A(rst_n), .B(r4), .Y(r0));
+(* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i1 (.A(r0), .Y(r1));
+(* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i2 (.A(r1), .Y(r2));
+(* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i3 (.A(r2), .Y(r3));
+(* keep = "true" *) sky130_fd_sc_hd__inv_1   u_ring_i4 (.A(r3), .Y(r4));
 ```
 
-Tune the chain length, drive strength, and any added cap loads to land near `OSC_CYCLES_PER_US ≈ 100`. The 1-Wire spec is forgiving: anything within roughly 0.5x–2x of the nominal frequency still works with a stock host master.
+A ripple divide-by-32 (`q0`..`q4`, async reset by `rst_n`) brings the ring down to `osc_clk = q4`. The divide ratio assumes the ring runs near 3 GHz; confirm the ring frequency with STA or silicon measurement and adjust the divider length. The number of kept inverter stages and their drive strength set the ring frequency and must be re-verified if the cell library changes.
+
+Tune the ring length, drive strength, and divider length to land `osc_clk` near `OSC_CYCLES_PER_US ≈ 100`. The 1-Wire spec is forgiving: anything within roughly 0.5x–2x of the nominal frequency still works with a stock host master.
 
 ## Host-side decoding
 
@@ -362,9 +366,9 @@ $ cf verify owire_id_test --sim rtl
 ## Common pitfalls
 
 - **No pull-up on a long-cable test board.** The OpenFrame pad in `dm=010` mode drives strong-0 / weak-1 — good enough for a few cm of board trace, marginal for long cables with significant capacitance. Add a 4.7 kΩ external pull-up to VCCIO if you see slow rising edges that confuse the host master.
-- **Forgot to replace the `SYNTHESIS` placeholder ring osc.** The default `\`ifdef SYNTHESIS` branch is a placeholder with hardcoded `#1` delays. Synthesis tools strip those out, leaving you with a combinational loop the optimizer will collapse. Replace with PDK-keep-attribute inverter cells before tape-out (see the "Internal oscillator" section).
 - **`OSC_CYCLES_PER_US` way off from 100.** All slot timings derive from this. If your ring osc lands at 50 MHz instead of 100, set `OSC_CYCLES_PER_US=50` to keep the µs-denominated thresholds correct.
 - **Shared-pin user logic pulling low for > 480 µs.** That looks identical to a master reset pulse and wakes the slave. Keep user-driven lows well below `T_RESET_MIN_US` unless you actually want to issue a reset pulse.
+- **Sustained low from any state resets the slave.** A wire held low for `T_RESET_MIN_US` (even by the slave itself) is treated as a reset pulse in any FSM state. This recovers the slave from a power-up or fault state that would otherwise hold the line low forever.
 - **Two 1-Wire devices on the same bus.** This IP implements the Read-ROM (`0x33`) subset only — no Search-ROM, no Match-ROM. It works as the sole slave on its bus. For multi-slave buses (or when you want the chip to share a wire with a real DS24xx), implement the Search-ROM algorithm on top of the current FSM.
 
 ## Reference design
